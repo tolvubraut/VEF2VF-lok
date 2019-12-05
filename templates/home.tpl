@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} Verkefni7 {% endblock %}
+{% block title %} Lokaverkefni {% endblock %}
 {% block content %}
 	<h1> Home Page </h1>
 	<p> Hello {{ nafn }} </p>
