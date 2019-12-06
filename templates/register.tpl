@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %} Verkefni7 {% endblock %}
+{% block title %} Verkefni8 {% endblock %}
 {% block content %}
 	<div class="register">
 		<h1>Register</h1>
@@ -11,7 +11,7 @@
 				<input type="password" name='passw'>
 			</label>
 			<label>Name:
-				<input type="text" name='nafn' required>
+				<input type="text" name='name' required>
 			</label>
 			<h5>{{ msg }}</h5>
 			<input type='submit' class="button" value="Register">

@@ -10,10 +10,8 @@
 			<label>Pass:
 				<input type="password" name='passw'>
 			</label>
-
 			<h5>{{ msg }}</h5>
 			<input type='submit' class="button" value="Login">
-			<a href="{{ url_for('register') }}">Register now</a>
 		</form>
 	</div>
 {% endblock %}

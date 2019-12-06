@@ -6,8 +6,8 @@ app.config['SECRET_KEY'] = "hcy148"
 SESSION_TYPE = 'redis'
 app.config.from_object(__name__)
 
-conn = pymysql.connect(host='tsuts.tskoli.is', port=3306, user='2509022390', password='mypassword', database='2509022390_vef2_v7')
-# conn = pymysql.connect(host='localhost', port=3306, user='root', password='', database='ok')
+conn = pymysql.connect(host='tsuts.tskoli.is', port=3306, user='2509022390', password='mypassword', database='2509022390_lokaverk')
+#conn = pymysql.connect(host='localhost', port=3306, user='root', password='', database='verk8')
 # https://pythonspot.com/login-authentication-with-flask/
 
 @app.route('/', methods=['GET', 'POST'])
@@ -21,8 +21,12 @@ def login():
         users = cur.fetchone()
         if users:
             session['loggedin'] = True
-            session['nafn'] = users[2]
-            return redirect(url_for('home'))
+            session['user'] = users[0]
+            session['name'] = users[2]
+            if session['name'] == 'Administrator':
+                return redirect(url_for('homeAd'))
+            else:
+                return redirect(url_for('home'))
         else:
             msg = 'Incorrect User/Pass!'
 
@@ -36,28 +40,28 @@ def logout():
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-    msg = ''
-    if request.method == 'POST' and 'user' in request.form and 'passw' in request.form:
-        user = request.form.get('user')
-        passw = request.form.get('passw')
-        nafn = request.form.get('nafn')
-        print(user)
-        print(passw)
-        print(nafn)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users where user = %s", (user))
-        users = cur.fetchone()
-        if users:
-            msg = 'Account already exist!'
-            print('abc')
-        else:
-            cur.execute("INSERT INTO users VALUES(%s,%s,%s)",(user, passw, nafn))
-            conn.commit()
-            print('def')
-            msg = 'You have sucessfully registeres!'
-    elif request.method == 'POST':
-        msg = 'PLease fill out the form!'
-    return render_template('register.tpl', msg=msg)
+    if 'loggedin' in session and session['name'] == 'Administrator':
+        msg = ''
+        if request.method == 'POST' and 'user' in request.form and 'passw' in request.form and 'name' in request.form:
+            user = request.form.get('user')
+            passw = request.form.get('passw')
+            name = request.form.get('name')
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM users where user = %s", (user))
+            users = cur.fetchone()
+            if users:
+                msg = 'Account already exist!'
+            else:
+                cur.execute("INSERT INTO users VALUES(%s,%s,%s)",(user, passw, name))
+                conn.commit()
+                cur.close()
+                msg = 'You have sucessfully registered!'
+        elif request.method == 'POST':
+            msg = 'PLease fill out the form!'
+        return render_template('register.tpl', msg=msg)
+    elif 'loggedin' in session and session['name'] != 'Administrator':
+        return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 @app.route('/home')
 def home():
@@ -65,9 +69,98 @@ def home():
         cur = conn.cursor()
         cur.execute("SELECT * FROM users")
         users = cur.fetchall()
-        return render_template('home.tpl', nafn=session['nafn'], users = users)
+        return render_template('home.tpl', name=session['name'], users=users)
     return redirect(url_for('login'))
 
+@app.route('/homeAd')  
+def homeAd():
+    if 'loggedin' in session and session['name'] == 'Administrator':
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users")
+        users = cur.fetchall()
+        return render_template('homeAd.tpl', name=session['name'], users=users)
+    return redirect(url_for('login'))
+
+@app.route('/blog', methods=['GET', 'POST'])
+def blog():
+    if 'loggedin' in session:
+        msg = ''
+        if request.method == 'POST' and 'title' in request.form and 'content' in request.form and 'user' in request.form:
+            title = request.form.get('title')
+            content = request.form.get('content')
+            user = request.form.get('user')
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM posts where title = %s", (title))
+            posts = cur.fetchone()
+            if posts:
+                msg = 'The blog already exist'
+            else:
+                cur.execute("INSERT INTO posts VALUES(%s,%s,%s)",(title, content, user))
+                conn.commit()
+                cur.close()
+                msg = 'You wrote the blog!'
+        elif request.method == 'POST':
+            msg = 'PLease fill out the form!'
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM posts")
+        posts = cur.fetchall()
+        return render_template('blog.tpl', msg=msg, posts=posts, name=session['name'])
+    return redirect(url_for('login'))
+
+@app.route('/update', methods=['GET', 'POST'])
+def update():
+    if 'loggedin' in session:
+        msg = ''
+        if request.method == 'POST' and 'title' in request.form and 'content' in request.form:
+            title = request.form.get('title')
+            content = request.form.get('content')
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM posts where title = %s", (title))
+            posts = cur.fetchone()
+            if posts:
+                if (session['user'] == posts[2]) or (session['user'] == 'admin'):
+                    cur.execute("UPDATE posts set content = %s where title = %s",(content, title))
+                    conn.commit()
+                    cur.close()
+                    msg = 'You updated the blog'
+                else:
+                    msg = 'The blog is not your'
+            else:
+                msg = 'The blog does not exist!'
+        elif request.method == 'POST':
+            msg = 'PLease fill out the form!'
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM posts")
+        posts = cur.fetchall()
+        return render_template('update.tpl', msg=msg, posts=posts)
+    return redirect(url_for('login'))
+
+@app.route('/delete', methods=['GET', 'POST'])
+def delete():
+    if 'loggedin' in session:
+        msg = ''
+        if request.method == 'POST' and 'title' in request.form:
+            title = request.form.get('title')
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM posts where title = %s", (title))
+            posts = cur.fetchone()
+            if posts:
+                if (session['user'] == posts[2]) or (session['user'] == 'admin'):
+                    cur.execute("DELETE FROM posts where title = %s",(title))
+                    conn.commit()
+                    cur.close()
+                    msg = 'You deleted the blog'
+                else:
+                    msg = 'The blog is not your'
+            else:
+                msg = 'The blog does not exist!'
+        elif request.method == 'POST':
+            msg = 'PLease fill out the form!'
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM posts")
+        posts = cur.fetchall()
+        return render_template('delete.tpl', msg=msg, posts=posts)
+    return redirect(url_for('login'))
 @app.errorhandler(404)
 def error404(error):
     return render_template('error404.tpl'), 404
