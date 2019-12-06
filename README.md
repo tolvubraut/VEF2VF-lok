@@ -1,6 +1,5 @@
 # VEF2VF-lok
+| username | password |
 | --- | --- |
-| user | password |
 | admin | admin |
 | test1 | test123 |
-| --- | --- |
