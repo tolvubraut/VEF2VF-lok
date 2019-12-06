@@ -6,7 +6,7 @@ app.config['SECRET_KEY'] = "hcy148"
 SESSION_TYPE = 'redis'
 app.config.from_object(__name__)
 
-conn = pymysql.connect(host='tsuts.tskoli.is', port=3306, user='2509022390', password='mypassword', database='2509022390_lokaverk')
+conn = pymysql.connect(host='tsuts.tskoli.is', port=3306, user='2509022390', password='mypassword', database='2509022390_loki')
 #conn = pymysql.connect(host='localhost', port=3306, user='root', password='', database='verk8')
 # https://pythonspot.com/login-authentication-with-flask/
 
@@ -90,21 +90,21 @@ def blog():
             content = request.form.get('content')
             user = request.form.get('user')
             cur = conn.cursor()
-            cur.execute("SELECT * FROM posts where title = %s", (title))
-            posts = cur.fetchone()
-            if posts:
+            cur.execute("SELECT * FROM blogs where title = %s", (title))
+            blogs = cur.fetchone()
+            if blogs:
                 msg = 'The blog already exist'
             else:
-                cur.execute("INSERT INTO posts VALUES(%s,%s,%s)",(title, content, user))
+                cur.execute("INSERT INTO blogs VALUES(%s,%s,%s)",(title, content, user))
                 conn.commit()
                 cur.close()
                 msg = 'You wrote the blog!'
         elif request.method == 'POST':
             msg = 'PLease fill out the form!'
         cur = conn.cursor()
-        cur.execute("SELECT * FROM posts")
-        posts = cur.fetchall()
-        return render_template('blog.tpl', msg=msg, posts=posts, name=session['name'])
+        cur.execute("SELECT * FROM blogs")
+        blogs = cur.fetchall()
+        return render_template('blog.tpl', msg=msg, blogs=blogs, name=session['name'])
     return redirect(url_for('login'))
 
 @app.route('/update', methods=['GET', 'POST'])
@@ -115,11 +115,11 @@ def update():
             title = request.form.get('title')
             content = request.form.get('content')
             cur = conn.cursor()
-            cur.execute("SELECT * FROM posts where title = %s", (title))
-            posts = cur.fetchone()
-            if posts:
-                if (session['user'] == posts[2]) or (session['user'] == 'admin'):
-                    cur.execute("UPDATE posts set content = %s where title = %s",(content, title))
+            cur.execute("SELECT * FROM blogs where title = %s", (title))
+            blogs = cur.fetchone()
+            if blogs:
+                if (session['user'] == blogs[2]) or (session['user'] == 'admin'):
+                    cur.execute("UPDATE blogs set content = %s where title = %s",(content, title))
                     conn.commit()
                     cur.close()
                     msg = 'You updated the blog'
@@ -130,9 +130,9 @@ def update():
         elif request.method == 'POST':
             msg = 'PLease fill out the form!'
         cur = conn.cursor()
-        cur.execute("SELECT * FROM posts")
-        posts = cur.fetchall()
-        return render_template('update.tpl', msg=msg, posts=posts)
+        cur.execute("SELECT * FROM blogs")
+        blogs = cur.fetchall()
+        return render_template('update.tpl', msg=msg, blogs=blogs)
     return redirect(url_for('login'))
 
 @app.route('/delete', methods=['GET', 'POST'])
@@ -142,11 +142,11 @@ def delete():
         if request.method == 'POST' and 'title' in request.form:
             title = request.form.get('title')
             cur = conn.cursor()
-            cur.execute("SELECT * FROM posts where title = %s", (title))
-            posts = cur.fetchone()
-            if posts:
-                if (session['user'] == posts[2]) or (session['user'] == 'admin'):
-                    cur.execute("DELETE FROM posts where title = %s",(title))
+            cur.execute("SELECT * FROM blogs where title = %s", (title))
+            blogs = cur.fetchone()
+            if blogs:
+                if (session['user'] == blogs[2]) or (session['user'] == 'admin'):
+                    cur.execute("DELETE FROM blogs where title = %s",(title))
                     conn.commit()
                     cur.close()
                     msg = 'You deleted the blog'
@@ -157,9 +157,9 @@ def delete():
         elif request.method == 'POST':
             msg = 'PLease fill out the form!'
         cur = conn.cursor()
-        cur.execute("SELECT * FROM posts")
-        posts = cur.fetchall()
-        return render_template('delete.tpl', msg=msg, posts=posts)
+        cur.execute("SELECT * FROM blogs")
+        blogs = cur.fetchall()
+        return render_template('delete.tpl', msg=msg, blogs=blogs)
     return redirect(url_for('login'))
 @app.errorhandler(404)
 def error404(error):
