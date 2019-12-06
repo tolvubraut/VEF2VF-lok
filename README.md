@@ -2,4 +2,4 @@
 | username | password |
 | --- | --- |
 | admin | admin |
-| test1 | test123 |
+| test | test123 |
