@@ -4,10 +4,10 @@
 	<div class="login">
 		<h1>Login</h1>
 		<form action="{{ url_for('login') }}" method="post">
-			<label>User:
+			<label>User: (Tester)
 				<input type="text" name='user' required>
 			</label>
-			<label>Pass:
+			<label>Pass: (test)
 				<input type="password" name='passw'>
 			</label>
 			<h5>{{ msg }}</h5>

@@ -6,7 +6,7 @@ app.config['SECRET_KEY'] = "hcy148"
 SESSION_TYPE = 'redis'
 app.config.from_object(__name__)
 
-conn = pymysql.connect(host='tsuts.tskoli.is', port=3306, user='2509022390', password='mypassword', database='2509022390_loki')
+conn = pymysql.connect(host='tsuts.tskoli.is', port=3306, user='gjg', password='2karidora1', database='gjg_lorraine')
 #conn = pymysql.connect(host='localhost', port=3306, user='root', password='', database='verk8')
 # https://pythonspot.com/login-authentication-with-flask/
 
@@ -161,7 +161,7 @@ def delete():
         blogs = cur.fetchall()
         return render_template('delete.tpl', msg=msg, blogs=blogs)
     return redirect(url_for('login'))
-    
+
 @app.errorhandler(404)
 def error404(error):
     return render_template('error404.tpl'), 404
