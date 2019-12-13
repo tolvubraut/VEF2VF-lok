@@ -21,3 +21,15 @@ CREATE TABLE gjg_lorraine.blogs (
   KEY user (user),
   CONSTRAINT user FOREIGN KEY (user) REFERENCES users (user)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO gjg_lorraine.users VALUES ('admin','admin','Administrator');
+
+
+
+INSERT INTO gjg_lorraine.blogs VALUES ('hallo heimur','Þetta er test, Það virkar','admin');
+
+SELECT * FROM gjg_lorraine.users;
+
+DELETE FROM gjg_lorraine.users where user = 'admin'
+
+INSERT INTO gjg_lorraine.users VALUES ('admin','123pass','Administrator');
