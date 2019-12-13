@@ -161,6 +161,7 @@ def delete():
         blogs = cur.fetchall()
         return render_template('delete.tpl', msg=msg, blogs=blogs)
     return redirect(url_for('login'))
+    
 @app.errorhandler(404)
 def error404(error):
     return render_template('error404.tpl'), 404
