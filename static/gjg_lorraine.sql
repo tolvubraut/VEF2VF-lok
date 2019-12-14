@@ -32,4 +32,4 @@ SELECT * FROM gjg_lorraine.users;
 
 DELETE FROM gjg_lorraine.users where user = 'admin'
 
-INSERT INTO gjg_lorraine.users VALUES ('admin','123pass','Administrator');
+INSERT INTO gjg_lorraine.users VALUES ('admin','2lykilord1','Administrator');
