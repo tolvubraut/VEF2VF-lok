@@ -51,7 +51,7 @@ form {
     border-radius: .5em;
     padding: 1em;
     margin: 1.5em auto;
-    width: 30%;
+    width: 80%;
     text-align: left;
 }
 table {
@@ -108,4 +108,7 @@ img {
 		margin: 0 auto;
 		padding: 0;
 	}
+	form {
+    width: 50%;
+  }
 }
